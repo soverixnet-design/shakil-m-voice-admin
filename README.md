@@ -10,7 +10,7 @@
 
 - 🔐 **Super Admin Security Gate**:
   - Secure Google OAuth sign-in restricted to Owner email (`yfastvpn@gmail.com`).
-  - Emergency Master Security PIN (`admin123`) for instant authentication on any device.
+  - Direct 1-Click Shakil Admin verified access (কোনো পাসওয়ার্ড বা পিন কোডের ঝামেলা নেই).
 - 👥 **Real-time User Management**:
   - Search by Name or ID with live filters (All, Admins, SVIP members, Banned users).
   - Add new users with custom balances, SVIP ranks, and badges.

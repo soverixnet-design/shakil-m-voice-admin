@@ -45,7 +45,6 @@ import {
 } from './firebase';
 
 const OWNER_EMAIL = 'yfastvpn@gmail.com';
-const MASTER_PIN = 'admin123';
 
 interface UserRecord {
   id: string;
@@ -111,9 +110,7 @@ const DEFAULT_ROOMS: RoomRecord[] = [
 
 export default function AdminApp() {
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [isPinAuthenticated, setIsPinAuthenticated] = useState<boolean>(false);
-  const [pinInput, setPinInput] = useState<string>('');
-  const [pinError, setPinError] = useState<string>('');
+  const [isDirectShakilAccess, setIsDirectShakilAccess] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'users' | 'requests' | 'quick_boost' | 'rooms' | 'banner' | 'gifts' | 'system'>('users');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -213,18 +210,13 @@ export default function AdminApp() {
     }
   };
 
-  const handlePinLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput === MASTER_PIN) {
-      setIsPinAuthenticated(true);
-      setPinError('');
-      showToast('মাস্টার পিন ভেরিফাইড! সুপার অ্যাডমিন কন্ট্রোল সেন্টারে স্বাগতম। 🛡️');
-    } else {
-      setPinError('ভুল পিন কোড! সঠিক অ্যাডমিন পিন প্রদান করুন।');
-    }
-  };
-
-  const isSuperAdmin = (currentUser?.email === OWNER_EMAIL) || isPinAuthenticated;
+  // Shakil Admin & Owner direct authorization (No password or PIN required)
+  const isSuperAdmin = Boolean(
+    currentUser?.email === OWNER_EMAIL ||
+    isDirectShakilAccess ||
+    currentUser?.displayName?.toLowerCase().includes('shakil') ||
+    currentUser?.displayName?.includes('শাকিল')
+  );
 
   // Action: Add / Update User Coins
   const handleUpdateUserCoins = () => {
@@ -411,10 +403,21 @@ export default function AdminApp() {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3.5">
+            <button
+              onClick={() => {
+                setIsDirectShakilAccess(true);
+                showToast('Shakil Admin হিসেবে সফলভাবে প্রবেশ করেছেন! 👑');
+              }}
+              className="w-full py-4 px-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 rounded-2xl font-black flex items-center justify-center gap-3 transition shadow-lg shadow-amber-500/20 active:scale-98"
+            >
+              <Crown className="w-5 h-5 fill-slate-950" />
+              <span>Shakil Admin হিসেবে সরাসরি প্রবেশ করুন</span>
+            </button>
+
             <button
               onClick={handleGoogleLogin}
-              className="w-full py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold flex items-center justify-center gap-3 transition shadow-md active:scale-98"
+              className="w-full py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-900 rounded-2xl font-bold flex items-center justify-center gap-3 transition shadow-md active:scale-98"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -424,37 +427,6 @@ export default function AdminApp() {
               </svg>
               <span>ওনার গুগল আইডি দিয়ে লগইন ({OWNER_EMAIL})</span>
             </button>
-
-            <div className="flex items-center my-4">
-              <div className="flex-1 border-t border-slate-700/60" />
-              <span className="px-3 text-xs text-slate-500 font-medium">অথবা মাস্টার পিন দিয়ে লগইন</span>
-              <div className="flex-1 border-t border-slate-700/60" />
-            </div>
-
-            <form onSubmit={handlePinLogin} className="space-y-3">
-              <div>
-                <label className="block text-xs text-slate-400 font-medium mb-1.5">মাস্টার সিকিউরিটি পিন (Master Security PIN)</label>
-                <div className="relative">
-                  <input
-                    type="password"
-                    value={pinInput}
-                    onChange={(e) => setPinInput(e.target.value)}
-                    placeholder="অ্যাডমিন পিন কোড লিখুন..."
-                    className="w-full bg-[#0a0f1d] border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none transition"
-                  />
-                  <Lock className="w-4 h-4 text-slate-500 absolute right-3.5 top-3.5" />
-                </div>
-                {pinError && <p className="text-xs text-red-400 mt-1.5">{pinError}</p>}
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/25 transition active:scale-98 flex items-center justify-center gap-2"
-              >
-                <Unlock className="w-4 h-4" />
-                <span>অ্যাডমিন প্যানেলে প্রবেশ করুন</span>
-              </button>
-            </form>
           </div>
 
           <div className="mt-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
@@ -520,7 +492,7 @@ export default function AdminApp() {
           <button
             onClick={() => {
               signOut(auth);
-              setIsPinAuthenticated(false);
+              setIsDirectShakilAccess(false);
               showToast('অ্যাডমিন প্যানেল থেকে সফলভাবে লগআউট হয়েছেন');
             }}
             className="p-2 bg-slate-800/80 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-xl transition border border-slate-700"
