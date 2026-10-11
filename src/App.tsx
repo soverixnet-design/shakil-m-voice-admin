@@ -111,6 +111,7 @@ const DEFAULT_ROOMS: RoomRecord[] = [
 export default function AdminApp() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isDirectShakilAccess, setIsDirectShakilAccess] = useState<boolean>(true);
+  const [securityPinInput, setSecurityPinInput] = useState<string>('admin123');
   const [activeTab, setActiveTab] = useState<'users' | 'requests' | 'quick_boost' | 'rooms' | 'banner' | 'gifts' | 'system'>('users');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -404,20 +405,54 @@ export default function AdminApp() {
           </div>
 
           <div className="space-y-3.5">
+            {/* Security PIN Option (admin123) - নো পাসওয়ার্ড */}
+            <div className="bg-slate-900/80 border border-amber-500/40 rounded-2xl p-4 text-center space-y-2.5">
+              <div className="flex items-center justify-center gap-2 text-amber-400 font-bold text-xs">
+                <Lock className="w-4 h-4" />
+                <span>👑 Shakil Admin সিকিউরিটি পিন (admin123) সুবিধা</span>
+              </div>
+              <p className="text-slate-400 text-[11px] leading-tight">
+                এডমিন পাসওয়ার্ড বাদ দেওয়া হয়েছে। শুধুমাত্র সিকিউরিটি পিন দিন:
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={securityPinInput}
+                  onChange={(e) => setSecurityPinInput(e.target.value)}
+                  placeholder="admin123"
+                  className="flex-1 bg-slate-800 border border-amber-500/50 rounded-xl px-3 py-2 text-center font-mono font-bold text-amber-300 text-sm focus:outline-none focus:border-amber-400"
+                />
+                <button
+                  onClick={() => {
+                    if (securityPinInput.trim() === 'admin123') {
+                      setIsDirectShakilAccess(true);
+                      showToast('👑 Shakil Admin সিকিউরিটি পিন (admin123) ভেরিফাইড!');
+                    } else {
+                      showToast('❌ ভুল পিন! সঠিক পিন: admin123');
+                    }
+                  }}
+                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-xl text-xs active:scale-95 shadow cursor-pointer"
+                >
+                  প্রবেশ
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={() => {
+                setSecurityPinInput('admin123');
                 setIsDirectShakilAccess(true);
-                showToast('Shakil Admin হিসেবে সফলভাবে প্রবেশ করেছেন! 👑');
+                showToast('Shakil Admin (admin123) হিসেবে সরাসরি প্রবেশ করেছেন! 👑');
               }}
-              className="w-full py-4 px-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 rounded-2xl font-black flex items-center justify-center gap-3 transition shadow-lg shadow-amber-500/20 active:scale-98"
+              className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 rounded-2xl font-black flex items-center justify-center gap-3 transition shadow-lg shadow-amber-500/20 active:scale-98 cursor-pointer"
             >
               <Crown className="w-5 h-5 fill-slate-950" />
-              <span>Shakil Admin হিসেবে সরাসরি প্রবেশ করুন</span>
+              <span>Shakil Admin এক ক্লিকে সরাসরি প্রবেশ</span>
             </button>
 
             <button
               onClick={handleGoogleLogin}
-              className="w-full py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-900 rounded-2xl font-bold flex items-center justify-center gap-3 transition shadow-md active:scale-98"
+              className="w-full py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-900 rounded-2xl font-bold flex items-center justify-center gap-3 transition shadow-md active:scale-98 cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
